@@ -1,0 +1,46 @@
+import React, { useState, useEffect } from 'react';
+import { View, Button, Text } from 'react-native';
+import { authorize } from 'react-native-app-auth';
+
+// Configuration for EScope Authentication
+const config = {
+  issuer: 'https://escope-auth.com',
+  clientId: 'YOUR_CLIENT_ID',
+  clientSecret: 'YOUR_CLIENT_SECRET',
+  redirectUrl: 'com.yourapp:/oauth2redirect',
+  scopes: ['openid', 'profile', 'email'],
+  serviceConfiguration: {
+    authorizationEndpoint: 'https://escope-auth.com/auth',
+    tokenEndpoint: 'https://escope-auth.com/token',
+    revocationEndpoint: 'https://escope-auth.com/revoke'
+  },
+};
+
+const AuthScreen = () => {
+  const [authState, setAuthState] = useState(null);
+
+  const handleLogin = async () => {
+    try {
+      const result = await authorize(config);
+      setAuthState(result);
+    } catch (error) {
+      console.error('Authentication error:', error);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button title="Login with EScope" onPress={handleLogin} />
+      {authState ? (
+        <View>
+          <Text>Access Token: {authState.accessToken}</Text>
+          <Text>ID Token: {authState.idToken}</Text>
+        </View>
+      ) : (
+        <Text>Please log in</Text>
+      )}
+    </View>
+  );
+};
+
+export default AuthScreen;
